@@ -4,27 +4,28 @@ import { useNavigate } from 'react-router-dom'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 /**
- * Privacy Policy page with comprehensive privacy information
- * Features professional layout and easy navigation
+ * Privacy Policy page with consistent dark/glassmorphism UI
  */
 export default function PrivacyPolicy(): React.JSX.Element {
   const navigate = useNavigate()
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen py-12 px-4">
+      <div className="min-h-screen py-12 px-4 bg-gradient-to-br from-gray-900 via-indigo-950 to-black">
         <div className="max-w-4xl mx-auto">
+
           {/* Header */}
-          <Card variant="glass" padding="lg" className="mb-8">
+          <Card variant="glass" padding="lg" className="mb-8 backdrop-blur-md bg-white/5 border-white/10">
             <CardHeader
               title="Privacy Policy"
               subtitle={`Last updated: ${new Date().toLocaleDateString()}`}
+              className="text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]"
             />
             <div className="mt-4">
               <Button
                 variant="outline"
                 onClick={() => navigate(-1)}
-                className="mb-0"
+                className="mb-0 border-white/30 text-white hover:bg-white/10"
               >
                 ← Back
               </Button>
@@ -32,18 +33,20 @@ export default function PrivacyPolicy(): React.JSX.Element {
           </Card>
 
           {/* Privacy Policy Content */}
-          <Card variant="elevated" padding="xl">
+          <Card variant="glass" padding="xl" className="backdrop-blur-md bg-white/5 border-white/10">
             <CardContent>
-              <div className="prose prose-gray max-w-none">
-                
+              <div className="prose prose-invert max-w-none">
+
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    1. Introduction
+                  </h2>
+                  <p className="text-gray-200 leading-relaxed mb-4">
                     Welcome to ReadySetHire ("we," "our," or "us"). This Privacy Policy explains how we collect, 
                     use, disclose, and safeguard your information when you use our interview management platform 
                     and related services (the "Service").
                   </p>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-gray-200 leading-relaxed">
                     We are committed to protecting your privacy and ensuring you have a positive experience on 
                     our platform. This policy outlines our practices concerning the collection and use of your 
                     information across our services.
@@ -51,136 +54,152 @@ export default function PrivacyPolicy(): React.JSX.Element {
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Information We Collect</h2>
-                  
-                  <h3 className="text-xl font-medium text-gray-800 mb-3">2.1 Information You Provide</h3>
-                  <ul className="list-disc list-inside text-gray-700 mb-4 space-y-2">
-                    <li><strong>Account Information:</strong> Name, email address, phone number, job title, and company information</li>
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    2. Information We Collect
+                  </h2>
+
+                  <h3 className="text-xl font-medium text-gray-100 mb-3">2.1 Information You Provide</h3>
+                  <ul className="list-disc list-inside text-gray-300 mb-4 space-y-2">
+                    <li><strong>Account Information:</strong> Name, email address, phone number, job title, and company info</li>
                     <li><strong>Interview Content:</strong> Questions, responses, evaluations, and interview recordings</li>
                     <li><strong>Applicant Data:</strong> Resume information, contact details, and interview responses</li>
                     <li><strong>Communication Data:</strong> Messages, feedback, and support communications</li>
                   </ul>
 
-                  <h3 className="text-xl font-medium text-gray-800 mb-3">2.2 Automatically Collected Information</h3>
-                  <ul className="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                  <h3 className="text-xl font-medium text-gray-100 mb-3">2.2 Automatically Collected Information</h3>
+                  <ul className="list-disc list-inside text-gray-300 mb-4 space-y-2">
                     <li><strong>Usage Data:</strong> Pages visited, features used, time spent on platform</li>
-                    <li><strong>Device Information:</strong> IP address, browser type, operating system, device identifiers</li>
-                    <li><strong>Cookies and Tracking:</strong> Preferences, session data, and analytics information</li>
+                    <li><strong>Device Information:</strong> IP address, browser type, OS, device identifiers</li>
+                    <li><strong>Cookies and Tracking:</strong> Preferences, session data, analytics info</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. How We Use Your Information</h2>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Provide, operate, and maintain our interview platform</li>
-                    <li>Process and facilitate interview sessions and evaluations</li>
-                    <li>Send important notifications about your account and interviews</li>
-                    <li>Improve our services and develop new features</li>
-                    <li>Provide customer support and respond to your inquiries</li>
-                    <li>Ensure platform security and prevent fraudulent activity</li>
-                    <li>Comply with legal obligations and enforce our terms</li>
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    3. How We Use Your Information
+                  </h2>
+                  <ul className="list-disc list-inside text-gray-300 space-y-2">
+                    <li>Provide, operate, and maintain our platform</li>
+                    <li>Process and facilitate interview sessions</li>
+                    <li>Send important account and interview notifications</li>
+                    <li>Improve our services and add new features</li>
+                    <li>Provide customer support</li>
+                    <li>Ensure platform security and prevent fraud</li>
+                    <li>Comply with legal obligations</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Information Sharing and Disclosure</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    We do not sell, trade, or otherwise transfer your personal information to third parties except in the following circumstances:
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    4. Information Sharing and Disclosure
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    We do not sell or trade your personal information except in these cases:
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
-                    <li><strong>With Your Consent:</strong> When you explicitly authorize us to share information</li>
-                    <li><strong>Service Providers:</strong> Trusted third parties who assist in operating our platform</li>
-                    <li><strong>Legal Requirements:</strong> When required by law or to protect rights and safety</li>
-                    <li><strong>Business Transfers:</strong> In connection with mergers, acquisitions, or asset sales</li>
+                  <ul className="list-disc list-inside text-gray-300 space-y-2">
+                    <li><strong>With Your Consent:</strong> When you explicitly authorize sharing</li>
+                    <li><strong>Service Providers:</strong> Trusted third parties assisting operations</li>
+                    <li><strong>Legal Requirements:</strong> When required by law</li>
+                    <li><strong>Business Transfers:</strong> During mergers or acquisitions</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Data Security</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    We implement appropriate technical and organizational security measures to protect your information:
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    5. Data Security
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    We implement strong technical and organizational measures:
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
+                  <ul className="list-disc list-inside text-gray-300 space-y-2">
                     <li>Encryption of data in transit and at rest</li>
-                    <li>Regular security assessments and monitoring</li>
-                    <li>Access controls and authentication measures</li>
-                    <li>Secure data storage and backup procedures</li>
-                    <li>Employee training on data protection practices</li>
+                    <li>Regular security audits</li>
+                    <li>Access controls and authentication</li>
+                    <li>Secure backups</li>
+                    <li>Employee data protection training</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Your Privacy Rights</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    Depending on your location, you may have the following rights regarding your personal information:
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    6. Your Privacy Rights
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    Depending on your location, you may have rights to:
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
-                    <li><strong>Access:</strong> Request access to your personal information</li>
-                    <li><strong>Correction:</strong> Request correction of inaccurate or incomplete data</li>
-                    <li><strong>Deletion:</strong> Request deletion of your personal information</li>
-                    <li><strong>Portability:</strong> Request transfer of your data to another service</li>
-                    <li><strong>Objection:</strong> Object to certain processing of your information</li>
+                  <ul className="list-disc list-inside text-gray-300 space-y-2">
+                    <li><strong>Access:</strong> Request your personal data</li>
+                    <li><strong>Correction:</strong> Fix inaccurate info</li>
+                    <li><strong>Deletion:</strong> Remove your data</li>
+                    <li><strong>Portability:</strong> Transfer your data</li>
+                    <li><strong>Objection:</strong> Opt out of certain processing</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Data Retention</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    We retain your information for as long as necessary to provide our services and fulfill the purposes 
-                    outlined in this Privacy Policy. Interview data may be retained for reasonable periods to maintain 
-                    historical records and comply with legal obligations. You may request deletion of your data at any time, 
-                    subject to legal and operational requirements.
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    7. Data Retention
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed">
+                    We retain data as long as necessary for our services and legal obligations. You may request deletion,
+                    subject to operational and compliance requirements.
                   </p>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Cookies and Tracking Technologies</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    We use cookies and similar technologies to enhance your experience on our platform:
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    8. Cookies and Tracking
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    We use cookies and tracking to enhance your experience:
                   </p>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
-                    <li><strong>Essential Cookies:</strong> Required for basic platform functionality</li>
-                    <li><strong>Analytics Cookies:</strong> Help us understand how you use our platform</li>
-                    <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+                  <ul className="list-disc list-inside text-gray-300 space-y-2">
+                    <li><strong>Essential:</strong> Required for functionality</li>
+                    <li><strong>Analytics:</strong> Understand usage</li>
+                    <li><strong>Preferences:</strong> Remember settings</li>
                   </ul>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. International Data Transfers</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    Your information may be transferred to and processed in countries other than your own. We ensure 
-                    appropriate safeguards are in place to protect your information in accordance with applicable 
-                    data protection laws and this Privacy Policy.
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    9. International Data Transfers
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed">
+                    Your information may be processed abroad with safeguards ensuring compliance with privacy laws.
                   </p>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Children's Privacy</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    Our Service is not intended for children under the age of 13. We do not knowingly collect 
-                    personal information from children under 13. If you become aware that a child has provided us 
-                    with personal information, please contact us so we can take appropriate action.
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    10. Children's Privacy
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed">
+                    Our Service is not for children under 13, and we do not knowingly collect their data. Contact us if
+                    you believe a child has provided info.
                   </p>
                 </section>
 
                 <section className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to This Privacy Policy</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    We may update this Privacy Policy from time to time. We will notify you of any changes by 
-                    posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage 
-                    you to review this Privacy Policy periodically for any changes.
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    11. Changes to This Privacy Policy
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed">
+                    We may update this Privacy Policy and will post changes with a new "Last updated" date. Check
+                    periodically for updates.
                   </p>
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Contact Information</h2>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    If you have any questions about this Privacy Policy or our privacy practices, please contact us:
+                  <h2 className="text-2xl font-semibold text-purple-300 drop-shadow-[0_0_6px_rgba(192,132,252,1)] mb-4">
+                    12. Contact Information
+                  </h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    For questions, contact us:
                   </p>
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@readysethire.com</p>
-                    <p className="text-gray-700 mb-2"><strong>Address:</strong> ReadySetHire Privacy Team</p>
-                    <p className="text-gray-700">123 Business Ave, Suite 100, Tech City, TC 12345</p>
+                  <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                    <p className="text-gray-200 mb-2"><strong>Email:</strong> privacy@readysethire.com</p>
+                    <p className="text-gray-200 mb-2"><strong>Address:</strong> ReadySetHire Privacy Team</p>
+                    <p className="text-gray-200">123 Business Ave, Suite 100, Tech City, TC 12345</p>
                   </div>
                 </section>
 

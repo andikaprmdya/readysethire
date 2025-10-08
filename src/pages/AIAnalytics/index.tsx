@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, LoadingSpinner, Card, CardHeader } from '../../components/ui'
-import { aiService, PerformanceAnalytics } from '../../services/openaiService'
+import { aiService } from '../../services/openaiService'
+import type { PerformanceAnalytics } from '../../services/openaiService'
 import { apiService } from '../../services/apiService'
 import ErrorBoundary from '../../components/ErrorBoundary'
 

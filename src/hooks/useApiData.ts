@@ -3,7 +3,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
-import { apiService, ApiError } from '../services/apiService'
+import { apiService } from '../services/apiService'
+import type { ApiError } from '../services/apiService'
 
 /**
  * Generic hook state interface

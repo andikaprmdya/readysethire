@@ -19,7 +19,6 @@ import PrivacyPolicy from "../pages/PrivacyPolicy"
 import TermsOfService from "../pages/TermsOfService"
 import CookiePolicy from "../pages/CookiePolicy"
 import TutorialOverlay from "./TutorialOverlay"
-import TutorialButton from "./TutorialButton"
 import SettingsModal from "./SettingsModal"
 
 const AppWithSettings: React.FC = () => {
@@ -92,7 +91,6 @@ const AppWithSettings: React.FC = () => {
 
         {/* Tutorial System */}
         <TutorialOverlay />
-        <TutorialButton variant="floating" />
 
         {/* Settings Modal */}
         <SettingsModal isOpen={isSettingsOpen} onClose={closeSettings} />

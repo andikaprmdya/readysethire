@@ -151,7 +151,7 @@ export default function QuestionsPage() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8 pt-12">
           {/* Header Section */}
           <div className="relative mb-16">
             <div className={`backdrop-blur-xl rounded-3xl shadow-xl border p-12 overflow-hidden ${
@@ -360,17 +360,17 @@ export default function QuestionsPage() {
                           settings.theme === 'light' ? (
                             question.difficulty === 'Easy'
                               ? 'bg-green-100 text-green-700 border-green-300'
-                            : question.difficulty === 'Medium'
+                            : (question.difficulty === 'Medium' || question.difficulty === 'Intermediate')
                               ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
-                            : question.difficulty === 'Hard'
+                            : (question.difficulty === 'Hard' || question.difficulty === 'Advanced')
                               ? 'bg-red-100 text-red-700 border-red-300'
                               : 'bg-blue-100 text-blue-700 border-blue-300'
                           ) : (
                             question.difficulty === 'Easy'
                               ? 'bg-green-500/20 text-green-300 border-green-300/30'
-                            : question.difficulty === 'Medium'
+                            : (question.difficulty === 'Medium' || question.difficulty === 'Intermediate')
                               ? 'bg-yellow-500/20 text-yellow-300 border-yellow-300/30'
-                            : question.difficulty === 'Hard'
+                            : (question.difficulty === 'Hard' || question.difficulty === 'Advanced')
                               ? 'bg-red-500/20 text-red-300 border-red-300/30'
                               : 'bg-blue-500/20 text-blue-300 border-blue-300/30'
                           )

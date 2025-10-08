@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, LoadingSpinner, Card, CardHeader } from '../../components/ui'
-import { aiService, ApplicantFeedback } from '../../services/openaiService'
+import { aiService } from '../../services/openaiService'
+import type { ApplicantFeedback } from '../../services/openaiService'
 import { apiService } from '../../services/apiService'
 import ErrorBoundary from '../../components/ErrorBoundary'
-import { Interview, Question, Applicant } from '../../types/models'
+import type { Interview, Question, Applicant } from '../../types/models'
 
 interface Answer {
   id: number

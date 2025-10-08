@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSettings, Theme, FontSize, ContrastLevel } from '../contexts/SettingsContext'
+import { useSettings } from '../contexts/SettingsContext'
+import type { Theme, FontSize, ContrastLevel } from '../contexts/SettingsContext'
 
 interface SettingsModalProps {
   isOpen: boolean

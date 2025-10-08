@@ -2,15 +2,18 @@ import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import api from "../../api/index"
 import { Question } from "../../types/models"
+import { useSettings } from "../../contexts/SettingsContext"
 
 export default function QuestionForm() {
   const navigate = useNavigate()
   const { interviewId, questionId } = useParams()
   const isEdit = Boolean(questionId)
+  const { settings } = useSettings()
 
   const [form, setForm] = useState({
     interview_id: Number(interviewId),
     question: "",
+    difficulty: "Intermediate",
   })
 
   const [loading, setLoading] = useState(false)
@@ -27,6 +30,7 @@ export default function QuestionForm() {
             setForm({
               interview_id: question.interview_id,
               question: question.question || "",
+              difficulty: question.difficulty || "Intermediate",
             })
           } else {
             setError("Question not found")
@@ -42,7 +46,7 @@ export default function QuestionForm() {
     }
   }, [questionId, isEdit])
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setForm((prev) => ({
       ...prev,
@@ -69,8 +73,14 @@ export default function QuestionForm() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <div className="text-center p-8 rounded-lg backdrop-blur-md bg-white/5 border border-white/10">
-          <div className="text-white text-xl mb-4">Loading question...</div>
+        <div className={`text-center p-8 rounded-lg backdrop-blur-md border ${
+          settings.theme === 'light'
+            ? 'bg-white/90 border-slate-300'
+            : 'bg-white/5 border-white/10'
+        }`}>
+          <div className={`text-xl mb-4 ${
+            settings.theme === 'light' ? 'text-slate-900' : 'text-white'
+          }`}>Loading question...</div>
         </div>
       </div>
     )
@@ -80,13 +90,25 @@ export default function QuestionForm() {
   if (error) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <div className="text-center p-8 rounded-lg backdrop-blur-md bg-white/5 border border-white/10">
+        <div className={`text-center p-8 rounded-lg backdrop-blur-md border ${
+          settings.theme === 'light'
+            ? 'bg-white/90 border-slate-300'
+            : 'bg-white/5 border-white/10'
+        }`}>
           <div className="text-red-400 text-xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
-          <p className="text-white/70 mb-4">{error}</p>
+          <h2 className={`text-xl font-semibold mb-2 ${
+            settings.theme === 'light' ? 'text-slate-900' : 'text-white'
+          }`}>Error</h2>
+          <p className={`mb-4 ${
+            settings.theme === 'light' ? 'text-slate-700' : 'text-white/70'
+          }`}>{error}</p>
           <button
             onClick={() => navigate(`/interviews/${interviewId}/questions`)}
-            className="px-6 py-3 rounded-lg border border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
+            className={`px-6 py-3 rounded-lg border transition-all duration-300 ${
+              settings.theme === 'light'
+                ? 'border-slate-300 text-slate-700 bg-transparent hover:bg-slate-100'
+                : 'border-white/30 text-white bg-transparent hover:bg-white/10'
+            }`}
           >
             Back to Questions
           </button>
@@ -98,21 +120,35 @@ export default function QuestionForm() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       {/* Header */}
-      <div className="mb-6 p-6 rounded-lg backdrop-blur-md bg-white/5 border border-white/10">
-        <h1 className="text-2xl font-bold text-white">
+      <div className={`mb-6 p-6 rounded-lg backdrop-blur-md border ${
+        settings.theme === 'light'
+          ? 'bg-white/90 border-slate-300'
+          : 'bg-white/5 border-white/10'
+      }`}>
+        <h1 className={`text-2xl font-bold ${
+          settings.theme === 'light' ? 'text-slate-900' : 'text-white'
+        }`}>
           {isEdit ? "Edit Question" : "Create Question"}
         </h1>
-        <p className="text-white/70 mt-2">
+        <p className={`mt-2 ${
+          settings.theme === 'light' ? 'text-slate-700' : 'text-white/70'
+        }`}>
           {isEdit ? "Update the question details" : "Add a new question to this interview"}
         </p>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-lg backdrop-blur-md bg-white/5 border border-white/10">
+      <form onSubmit={handleSubmit} className={`p-6 rounded-lg backdrop-blur-md border ${
+        settings.theme === 'light'
+          ? 'bg-white/90 border-slate-300'
+          : 'bg-white/5 border-white/10'
+      }`}>
         <div className="space-y-6">
           {/* Question Text Field */}
           <div>
-            <label className="block text-sm font-medium text-white/90 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${
+              settings.theme === 'light' ? 'text-slate-700' : 'text-white/90'
+            }`}>
               Question Text *
             </label>
             <textarea
@@ -121,9 +157,37 @@ export default function QuestionForm() {
               value={form.question}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 resize-none"
+              className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 resize-none ${
+                settings.theme === 'light'
+                  ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 focus:ring-blue-500/50 focus:border-blue-500 hover:bg-slate-50'
+                  : 'bg-white/10 border-white/20 text-white placeholder-white/60 focus:ring-blue-500/50 focus:border-blue-500/50 hover:bg-white/15'
+              }`}
               required
             />
+          </div>
+
+          {/* Difficulty Field */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${
+              settings.theme === 'light' ? 'text-slate-700' : 'text-white/90'
+            }`}>
+              Difficulty Level *
+            </label>
+            <select
+              name="difficulty"
+              value={form.difficulty}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 ${
+                settings.theme === 'light'
+                  ? 'bg-white border-slate-300 text-slate-900 focus:ring-blue-500/50 focus:border-blue-500 hover:bg-slate-50'
+                  : 'bg-white/10 border-white/20 text-white focus:ring-blue-500/50 focus:border-blue-500/50 hover:bg-white/15'
+              }`}
+              required
+            >
+              <option value="Easy">Easy</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
           </div>
 
           {/* Action Buttons */}
@@ -131,7 +195,11 @@ export default function QuestionForm() {
             <button
               type="button"
               onClick={() => navigate(`/interviews/${interviewId}/questions`)}
-              className="flex-1 px-6 py-3 rounded-lg border border-white/30 text-white bg-transparent hover:bg-white/10 transition-all duration-300"
+              className={`flex-1 px-6 py-3 rounded-lg border bg-transparent transition-all duration-300 ${
+                settings.theme === 'light'
+                  ? 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  : 'border-white/30 text-white hover:bg-white/10'
+              }`}
             >
               Cancel
             </button>

@@ -76,6 +76,15 @@ export const designTokens = {
       tertiary: '#334155',     // Medium gray background
       surface: '#ffffff',      // White surfaces
       muted: '#f8fafc',       // Light background
+
+      // Light mode specific backgrounds
+      light: {
+        primary: '#f1f5f9',    // Cool light gray background
+        secondary: '#e2e8f0',  // Medium light gray
+        navbar: '#ffffff',     // Pure white navbar
+        footer: '#f8fafc',     // Very light gray footer
+        content: '#ffffff',    // White content areas
+      }
     },
 
     // Text Colors with proper contrast
@@ -92,6 +101,13 @@ export const designTokens = {
       light: '#e2e8f0',
       medium: '#cbd5e1',
       dark: '#94a3b8',
+
+      // Light mode specific borders
+      lightMode: {
+        subtle: '#f1f5f9',
+        medium: '#e2e8f0',
+        strong: '#cbd5e1',
+      }
     },
   },
 

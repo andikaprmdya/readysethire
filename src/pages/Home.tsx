@@ -1,12 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, CardContent, Button, Modal, ModalHeader, ModalBody, ModalFooter } from '../components/ui'
+import { Card, CardContent, Button, Modal, ModalBody, ModalFooter } from '../components/ui'
 import TutorialButton from '../components/TutorialButton'
+
+/**
+ * Interface for feature data structure
+ */
+interface Feature {
+  id: string
+  icon: string
+  title: string
+  description: string
+  fullDescription: string
+  features: string[]
+  howToUse: string[]
+  color: string
+}
 
 /**
  * Feature data for the homepage cards
  */
-const features = [
+const features: Feature[] = [
   {
     id: 'smart-interviews',
     icon: '📋',
@@ -55,7 +69,7 @@ const features = [
     ],
     color: 'from-indigo-600 to-blue-600'
   }
-] as const
+]
 
 /**
  * Floating orb component with random animation
@@ -98,7 +112,7 @@ const FloatingOrb: React.FC<{
  */
 export default function Home(): React.JSX.Element {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [selectedFeature, setSelectedFeature] = useState<typeof features[0] | null>(null)
+  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
 
   // Trigger animations on component mount
@@ -107,7 +121,7 @@ export default function Home(): React.JSX.Element {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleFeatureClick = (feature: typeof features[0]) => {
+  const handleFeatureClick = (feature: Feature) => {
     setSelectedFeature(feature)
   }
 

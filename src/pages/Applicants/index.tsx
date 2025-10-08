@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, LoadingSpinner } from "../../components/ui"
 import ErrorBoundary from "../../components/ErrorBoundary"
 import TutorialButton from "../../components/TutorialButton"
+import { useSettings } from "../../contexts/SettingsContext"
 
 interface Applicant {
   id: number
@@ -21,6 +22,7 @@ export default function ApplicantsPage() {
   const [applicants, setApplicants] = useState<Applicant[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const { settings } = useSettings()
   
   // Modal state for generate link
   const [generateLinkModal, setGenerateLinkModal] = useState<{
@@ -124,11 +126,15 @@ export default function ApplicantsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-16">
-          <LoadingSpinner 
-            size="lg" 
-            text="Loading applicants..." 
-            centered 
+        <div className={`backdrop-blur-xl rounded-3xl shadow-xl border p-16 ${
+          settings.theme === 'light'
+            ? 'bg-white/90 border-slate-300 shadow-slate-200'
+            : 'bg-white/5 border-white/20'
+        }`}>
+          <LoadingSpinner
+            size="lg"
+            text="Loading applicants..."
+            centered
           />
         </div>
       </div>
@@ -138,23 +144,47 @@ export default function ApplicantsPage() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8 pt-12">
           {/* Header Section */}
           <div className="relative mb-16">
-            <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-12 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-white/[0.02]"></div>
+            <div className={`backdrop-blur-xl rounded-3xl shadow-xl border p-12 overflow-hidden ${
+              settings.theme === 'light'
+                ? 'bg-white/90 border-slate-300 shadow-slate-200/50'
+                : 'bg-white/5 border-white/20'
+            }`}>
+              <div className={`absolute inset-0 bg-gradient-to-br ${
+                settings.theme === 'light'
+                  ? 'from-slate-50/50 via-transparent to-blue-50/20'
+                  : 'from-white/[0.02] via-transparent to-white/[0.02]'
+              }`}></div>
               <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-10 lg:space-y-0">
                 <div className="space-y-6">
-                  <h1 className="text-6xl font-black text-white/95 leading-tight">
+                  <h1 className={`text-6xl font-black leading-tight ${
+                    settings.theme === 'light'
+                      ? 'text-slate-800'
+                      : 'text-white/95'
+                  }`}>
                     Applicants
                   </h1>
-                  <p className="text-white/70 text-xl font-medium leading-relaxed max-w-2xl">
+                  <p className={`text-xl font-medium leading-relaxed max-w-2xl ${
+                    settings.theme === 'light'
+                      ? 'text-slate-600'
+                      : 'text-white/70'
+                  }`}>
                     Manage candidates and track their interview progress
                   </p>
                   <div className="flex items-center space-x-6 pt-4">
-                    <div className="flex items-center bg-white/8 backdrop-blur-xl px-5 py-3 rounded-full shadow-lg border border-white/20">
+                    <div className={`flex items-center backdrop-blur-xl px-5 py-3 rounded-full shadow-lg border ${
+                      settings.theme === 'light'
+                        ? 'bg-slate-100/80 border-slate-300'
+                        : 'bg-white/8 border-white/20'
+                    }`}>
                       <div className="w-2 h-2 bg-indigo-400/80 rounded-full mr-3 animate-pulse"></div>
-                      <span className="text-white/80 font-medium text-sm">
+                      <span className={`font-medium text-sm ${
+                        settings.theme === 'light'
+                          ? 'text-slate-700'
+                          : 'text-white/80'
+                      }`}>
                         {applicants?.length || 0} Applicants
                       </span>
                     </div>
@@ -183,18 +213,36 @@ export default function ApplicantsPage() {
           {/* Applicants Content */}
           {(applicants?.length || 0) === 0 ? (
             <div className="relative">
-              <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-24 text-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-indigo-500/[0.02]"></div>
+              <div className={`backdrop-blur-xl rounded-3xl shadow-xl border p-24 text-center overflow-hidden ${
+                settings.theme === 'light'
+                  ? 'bg-white/90 border-slate-300 shadow-slate-200/50'
+                  : 'bg-white/5 border-white/20'
+              }`}>
+                <div className={`absolute inset-0 bg-gradient-to-br ${
+                  settings.theme === 'light'
+                    ? 'from-slate-50/50 via-transparent to-indigo-100/20'
+                    : 'from-white/[0.02] via-transparent to-indigo-500/[0.02]'
+                }`}></div>
                 <div className="relative max-w-md mx-auto">
-                  <div className="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-12 shadow-lg border border-white/20">
-                    <svg className="w-12 h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className={`w-24 h-24 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-12 shadow-lg border ${
+                    settings.theme === 'light'
+                      ? 'bg-slate-100 border-slate-300'
+                      : 'bg-white/10 border-white/20'
+                  }`}>
+                    <svg className={`w-12 h-12 ${
+                      settings.theme === 'light' ? 'text-slate-500' : 'text-white/60'
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-3xl font-bold text-white/90 mb-6 leading-tight">
+                  <h3 className={`text-3xl font-bold mb-6 leading-tight ${
+                    settings.theme === 'light' ? 'text-slate-800' : 'text-white/90'
+                  }`}>
                     No applicants yet
                   </h3>
-                  <p className="text-white/60 mb-12 text-lg leading-relaxed">
+                  <p className={`mb-12 text-lg leading-relaxed ${
+                    settings.theme === 'light' ? 'text-slate-600' : 'text-white/60'
+                  }`}>
                     Add your first candidate to start the interview process
                   </p>
                   <Button
@@ -217,17 +265,31 @@ export default function ApplicantsPage() {
               {applicants?.map((applicant) => (
                 <div
                   key={applicant.id}
-                  className="group relative bg-white/5 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl hover:scale-[1.02] hover:bg-white/8 transition-all duration-500"
+                  className={`group relative backdrop-blur-xl rounded-3xl shadow-xl border overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ${
+                    settings.theme === 'light'
+                      ? 'bg-white/90 border-slate-300 shadow-slate-200/50 hover:bg-white hover:shadow-slate-300/40'
+                      : 'bg-white/5 border-white/20 hover:bg-white/8'
+                  }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-indigo-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                    settings.theme === 'light'
+                      ? 'from-slate-50/50 via-transparent to-indigo-100/30'
+                      : 'from-white/[0.02] via-transparent to-indigo-500/[0.02]'
+                  }`}></div>
                   
                   {/* Header with Status */}
-                  <div className="relative p-8 border-b border-white/10">
+                  <div className={`relative p-8 border-b ${
+                    settings.theme === 'light' ? 'border-slate-200/60' : 'border-white/10'
+                  }`}>
                     <div className="flex justify-between items-start mb-6">
                       <div className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-lg backdrop-blur-xl border ${
                         applicant.interview_status === 'Completed'
-                          ? 'bg-green-500/20 text-green-300 border-green-300/30'
-                          : 'bg-yellow-500/20 text-yellow-300 border-yellow-300/30'
+                          ? settings.theme === 'light'
+                            ? 'bg-green-100 text-green-700 border-green-300'
+                            : 'bg-green-500/20 text-green-300 border-green-300/30'
+                          : settings.theme === 'light'
+                            ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
+                            : 'bg-yellow-500/20 text-yellow-300 border-yellow-300/30'
                       }`}>
                         {applicant.interview_status}
                       </div>
@@ -324,15 +386,15 @@ export default function ApplicantsPage() {
               {generateLinkModal.applicant && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-white  mb-2">
                       Interview Link for {generateLinkModal.applicant.title} {generateLinkModal.applicant.firstname} {generateLinkModal.applicant.surname}
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-400 mb-4">
                       Share this link with the candidate to allow them to take their interview.
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-200 mb-2">
                       Interview Link
                     </label>
                     <div className="flex">

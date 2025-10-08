@@ -3,8 +3,9 @@
  * Handles all HTTP requests with consistent error handling and response formatting
  */
 
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios'
-import { appConfig } from '../config/environment'
+import axios from 'axios'
+import type { AxiosInstance, AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios'
+import { appConfig, findApiEndpoint, updateApiUrl, isDevelopment } from '../config/environment'
 
 /**
  * API Error interface for consistent error handling
@@ -56,7 +57,7 @@ class ApiService {
 
   constructor(baseURL: string, retryConfig: Partial<RetryConfig> = {}) {
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig }
-    
+
     // Create axios instance with default configuration
     this.client = axios.create({
       baseURL,
@@ -68,6 +69,29 @@ class ApiService {
     })
 
     this.setupInterceptors()
+
+    // Temporarily disable auto-discovery to fix 404 errors
+    // if (isDevelopment()) {
+    //   this.discoverAndUpdateApiEndpoint()
+    // }
+  }
+
+  /**
+   * Attempt to discover the actual API endpoint in development mode
+   */
+  private async discoverAndUpdateApiEndpoint(): Promise<void> {
+    try {
+      const discoveredUrl = await findApiEndpoint()
+      if (discoveredUrl !== this.client.defaults.baseURL) {
+        // Update the Axios instance base URL
+        this.client.defaults.baseURL = discoveredUrl
+        // Update the global config
+        updateApiUrl(discoveredUrl)
+        console.log('🎯 API endpoint discovered and updated:', discoveredUrl)
+      }
+    } catch (error) {
+      console.warn('⚠️ API endpoint discovery failed, using fallback:', this.client.defaults.baseURL)
+    }
   }
 
   /**
@@ -76,7 +100,7 @@ class ApiService {
   private setupInterceptors(): void {
     // Request interceptor for logging and auth
     this.client.interceptors.request.use(
-      (config) => {
+      (config: AxiosRequestConfig) => {
         // Add auth token from environment variables or localStorage
         const envToken = import.meta.env.VITE_JWT_TOKEN
         const localToken = localStorage.getItem('auth_token')
@@ -109,19 +133,19 @@ class ApiService {
 
         return config
       },
-      (error) => Promise.reject(error)
+      (error: AxiosError) => Promise.reject(error)
     )
 
     // Response interceptor for logging and error transformation
     this.client.interceptors.response.use(
-      (response) => {
+      (response: AxiosResponse) => {
         // Log API responses in development
         if (process.env.NODE_ENV === 'development') {
           console.log('API Response:', response.data)
         }
         return response
       },
-      (error) => this.handleResponseError(error)
+      (error: AxiosError) => this.handleResponseError(error)
     )
   }
 

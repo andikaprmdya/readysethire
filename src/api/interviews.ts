@@ -1,5 +1,5 @@
 import api from './index'
-import { Interview, InterviewInput } from '../types/models'
+import type { Interview, InterviewInput } from '../types/models'
 
 /**
  * Get all interviews for the authenticated user

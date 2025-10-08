@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback, HTMLAttributes } from 'react'
+import { useEffect, useCallback } from 'react'
+import type { HTMLAttributes } from 'react'
 import { createPortal } from 'react-dom'
 
 /**

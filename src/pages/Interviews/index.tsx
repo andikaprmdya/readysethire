@@ -174,7 +174,7 @@ export default function InterviewsPage(): React.JSX.Element {
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8 pt-12">
           {/* Debug Info - Only shown in development */}
           {process.env.NODE_ENV === 'development' && (
             <div className="mb-8 p-4 bg-yellow-500/5 backdrop-blur-xl border border-yellow-300/20 rounded-2xl shadow-lg">

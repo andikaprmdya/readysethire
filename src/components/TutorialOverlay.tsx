@@ -66,18 +66,24 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ className = '' }) => 
       return
     }
 
-    // Add a small delay to ensure DOM is ready
-    const timeoutId = setTimeout(() => {
-      const found = findAndHighlightElement(step.target)
-      if (!found) {
-        // Retry after a longer delay if element not found
-        setTimeout(() => {
-          findAndHighlightElement(step.target)
-        }, 1000)
-      }
-    }, 100)
+    let retryCount = 0
+    const maxRetries = 10
+    const baseDelay = 50
 
-    return () => clearTimeout(timeoutId)
+    const tryFindElement = () => {
+      const found = findAndHighlightElement(step.target)
+      if (!found && retryCount < maxRetries) {
+        retryCount++
+        setTimeout(tryFindElement, baseDelay * Math.min(retryCount, 4)) // Progressive delay up to 200ms
+      }
+    }
+
+    // Start immediately for better responsiveness
+    tryFindElement()
+
+    return () => {
+      retryCount = maxRetries // Stop retries if effect is cleaned up
+    }
   }, [step, isActive, findAndHighlightElement])
 
   // Update element rect on window resize
@@ -159,9 +165,10 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ className = '' }) => 
         <motion.div
           ref={overlayRef}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: isElementReady ? 1 : 0.3 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto"
+          transition={{ duration: 0.15, ease: 'easeOut' }}
+          className="absolute inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-auto"
           style={overlayStyle}
           onClick={(e) => {
             // Only close if clicking on the overlay itself, not the cutout area

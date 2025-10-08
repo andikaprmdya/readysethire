@@ -32,6 +32,7 @@ export interface Question extends BaseModel {
   correct_answer?: string
   time_limit?: number  // In minutes
   points: number
+  difficulty?: 'Easy' | 'Intermediate' | 'Advanced'  // Optional difficulty level
 }
 
 // Question creation/update payload
@@ -43,6 +44,7 @@ export interface QuestionInput {
   correct_answer?: string
   time_limit?: number
   points: number
+  difficulty?: 'Easy' | 'Intermediate' | 'Advanced'  // Optional difficulty level
   username?: string  // Will be added by interceptor
 }
 

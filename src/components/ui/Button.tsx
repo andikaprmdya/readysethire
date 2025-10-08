@@ -1,5 +1,5 @@
-import React, { forwardRef, ButtonHTMLAttributes } from 'react'
-import { designTokens } from '../../styles/designTokens'
+import { forwardRef } from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 
 /**
  * Button component variants for different use cases

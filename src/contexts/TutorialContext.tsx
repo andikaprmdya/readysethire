@@ -52,7 +52,7 @@ const defaultTutorialFlows: TutorialFlow[] = [
         id: 'navigation',
         target: 'nav a[href="/interviews"]',
         title: '📋 Interviews Section',
-        content: 'This is where you can create, manage, and track all your interviews. Click here to view existing interviews.',
+        content: 'This larger button takes you to the interviews page where you can create, manage, and track all your interviews. The button is now sized for better visibility and accessibility.',
         placement: 'bottom',
         action: 'hover'
       },
@@ -107,22 +107,22 @@ const defaultTutorialFlows: TutorialFlow[] = [
         id: 'interview-list',
         target: '.grid.grid-cols-1',
         title: '📋 Interview Dashboard',
-        content: 'This is your interview dashboard where you can see all your created interviews. Each card shows the interview status and key details.',
+        content: 'This is your interview dashboard where you can see all your created interviews. Each card shows the interview status, question count, and applicant statistics.',
         placement: 'top'
       },
       {
         id: 'create-new',
         target: 'a[href*="new"]',
         title: '➕ Create New Interview',
-        content: 'Click here to create a new interview. You\'ll be guided through setting up questions and interview details.',
+        content: 'Start by clicking here to create a new interview. First, you\'ll set up the basic interview details like title and job role.',
         placement: 'bottom'
       },
       {
-        id: 'interview-actions',
-        target: '.group-hover\\:opacity-100',
-        title: '⚙️ Interview Actions',
-        content: 'Hover over interview cards to see available actions like editing, viewing applicants, or managing questions.',
-        placement: 'left'
+        id: 'interview-workflow',
+        target: '.grid.grid-cols-1',
+        title: '🔄 Complete Workflow',
+        content: 'The typical flow: 1) Create Interview → 2) Add Questions → 3) Add Applicants → 4) Generate & Send Links → 5) Review Responses. Each interview card shows progress indicators.',
+        placement: 'top'
       }
     ]
   },
@@ -158,25 +158,32 @@ const defaultTutorialFlows: TutorialFlow[] = [
     name: 'Managing Applicants',
     steps: [
       {
-        id: 'applicants-list',
-        target: '.min-h-screen .grid',
+        id: 'applicants-overview',
+        target: '.max-w-7xl',
         title: '👥 Applicants Overview',
-        content: 'Here you can see all applicants for your interviews. Track their progress and review their responses.',
+        content: 'This page shows all applicants for the selected interview. You can add new applicants, generate interview links, and track completion status.',
         placement: 'top'
       },
       {
-        id: 'applicant-status',
-        target: '.inline-block.px-3.py-1',
-        title: '📊 Application Status',
-        content: 'Each applicant shows their current status: invited, in progress, completed, or reviewed.',
+        id: 'add-applicant',
+        target: 'button[class*="Add New Applicant"], a[href*="new"]',
+        title: '➕ Add Applicants',
+        content: 'First, add your applicants by clicking here. You\'ll enter their basic details like name, email, and phone number.',
         placement: 'bottom'
       },
       {
-        id: 'view-responses',
-        target: 'button[class*="bg-blue"]',
-        title: '👁️ View Responses',
-        content: 'Click to view detailed responses from applicants, including their recorded answers and transcripts.',
-        placement: 'left'
+        id: 'generate-links',
+        target: 'button[class*="Link"]',
+        title: '🔗 Generate Interview Links',
+        content: 'After adding applicants, generate unique interview links for each candidate. Each link is personalized and secure.',
+        placement: 'top'
+      },
+      {
+        id: 'track-progress',
+        target: '.grid.grid-cols-1.md\\:grid-cols-2',
+        title: '📊 Track Progress',
+        content: 'Monitor applicant status: "Not Started" (invited), "Completed" (finished). View answers and AI feedback once completed.',
+        placement: 'top'
       }
     ]
   }
@@ -241,9 +248,10 @@ export const TutorialProvider: React.FC<TutorialProviderProps> = ({
       return
     }
 
+    // Immediately set the tutorial state to prevent lag
+    setIsActive(true)
     setCurrentFlow(flowId)
     setCurrentStep(0)
-    setIsActive(true)
     setIsStepVisible(true)
   }, [registeredFlows])
 

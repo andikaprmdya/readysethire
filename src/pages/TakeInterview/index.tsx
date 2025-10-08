@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../../api/index"
 import ErrorBoundary from "../../components/ErrorBoundary"
-import { Interview, Question, Applicant } from "../../types/models"
+import type { Interview, Question, Applicant } from "../../types/models"
 
 // Web Speech API type declarations (not in TypeScript standard library)
 interface SpeechRecognitionConstructor {

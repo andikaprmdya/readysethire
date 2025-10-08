@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from './ui'
-import { aiService, GeneratedQuestion } from '../services/openaiService'
+import { aiService } from '../services/openaiService'
+import type { GeneratedQuestion } from '../services/openaiService'
 
 interface AIQuestionGeneratorProps {
   isOpen: boolean

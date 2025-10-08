@@ -1,5 +1,4 @@
-import React, { HTMLAttributes } from 'react'
-import { designTokens } from '../../styles/designTokens'
+import type { HTMLAttributes } from 'react'
 
 /**
  * Card component variants for different visual styles

@@ -7,11 +7,64 @@ export interface AppConfig {
   debug: boolean
 }
 
+// Function to test if an API endpoint is available
+const testApiEndpoint = async (url: string, timeout: number = 1000): Promise<boolean> => {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+    const response = await fetch(`${url}/health`, {
+      method: 'GET',
+      signal: controller.signal,
+      mode: 'cors'
+    })
+
+    clearTimeout(timeoutId)
+    return response.ok || response.status === 404 // 404 is okay, means server is running but no health endpoint
+  } catch (error) {
+    return false
+  }
+}
+
 // Function to detect if running in development/testing environment
 const detectEnvironment = (): 'development' | 'testing' | 'production' => {
   if (import.meta.env.DEV) return 'development'
   if (import.meta.env.VITE_APP_ENV === 'testing') return 'testing'
   return 'production'
+}
+
+// Function to dynamically discover API port by testing common development ports
+const discoverApiPort = async (host: string = 'localhost'): Promise<string> => {
+  // Common development ports in order of preference
+  const devPorts = ['3000', '5000', '8000', '8080', '5432']
+  const currentPort = window.location.port
+
+  // Test ports in parallel for faster discovery
+  const testPromises = devPorts
+    .filter(port => port !== currentPort) // Exclude frontend port
+    .map(async (port) => {
+      const url = `http://${host}:${port}/api`
+      const isAvailable = await testApiEndpoint(url, 500) // Quick 500ms timeout
+      return { port, url, isAvailable }
+    })
+
+  try {
+    const results = await Promise.allSettled(testPromises)
+
+    // Find the first working API server
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value.isAvailable) {
+        console.log(`🚀 Discovered API server at: ${result.value.url}`)
+        return result.value.url
+      }
+    }
+  } catch (error) {
+    console.warn('API discovery failed:', error)
+  }
+
+  // Fallback to conventional port based on frontend port
+  const fallbackPort = currentPort === '5173' ? '3000' : '3000'
+  return `http://${host}:${fallbackPort}/api`
 }
 
 // Function to determine API URL based on environment
@@ -25,21 +78,19 @@ const getApiUrl = (): string => {
 
   // If running in development and no explicit URL is set
   if (env === 'development') {
-    // Try common development ports
-    const devPorts = ['3000', '5000', '8000', '8080', '5432']
-    const currentPort = window.location.port || '80'
-
-    // Use current host with different port for API, or fallback to localhost
     const currentHost = window.location.hostname
 
-    if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
-      // If not on localhost, try using the same host with a different port for API
-      // This is useful for testing environments
-      return `http://${currentHost}:${currentPort}/api`
-    }
+    // Temporarily use production API for development until local server is set up
+    console.log('🔧 Development mode - using production API temporarily')
+    return 'https://comp2140a2.uqcloud.net/api'
 
-    // Default development configuration
-    return 'http://localhost:3000/api'
+    // TODO: Uncomment and configure when local API server is available
+    // if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+    //   console.log(`🔍 Development mode on ${currentHost} - API discovery will be attempted`)
+    //   return `http://${currentHost}:3000/api`
+    // }
+    // console.log('🔍 Development mode - API port discovery will be attempted')
+    // return 'http://localhost:3000/api'
   }
 
   // If running in testing environment
@@ -69,6 +120,23 @@ export const isTesting = () => appConfig.environment === 'testing'
 
 // Helper function to check if in production
 export const isProduction = () => appConfig.environment === 'production'
+
+// Export the dynamic API discovery function for use in development
+export const findApiEndpoint = discoverApiPort
+
+// Function to update the API URL after discovery (for development)
+export const updateApiUrl = (newUrl: string) => {
+  // Create a new config object since the original is frozen
+  Object.defineProperty(appConfig, 'apiUrl', {
+    value: newUrl,
+    writable: false,
+    configurable: true
+  })
+
+  if (appConfig.debug) {
+    console.log(`🔄 API URL updated to: ${newUrl}`)
+  }
+}
 
 // Log configuration for debugging
 if (appConfig.debug) {
