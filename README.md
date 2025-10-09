@@ -1764,3 +1764,351 @@ describe('useApiData', () => {
 ---
 
 This documentation provides a complete understanding of how ReadySetHire works, from the entry point to data persistence, covering every major component, hook, and integration point in the application.
+
+---
+
+# 📚 Technical Deep Dive: Component Integration & Data Flow
+
+This section explains how the core architectural components work together to create a cohesive application.
+
+---
+
+## 1. 🎨 Light/Dark Mode System
+
+### How It Works
+
+The theme system uses React Context to manage global settings that persist across browser sessions. When a user toggles the theme, the SettingsContext updates its state and immediately applies the change to the HTML document element by adding or removing CSS classes.
+
+The flow works like this: User clicks theme toggle → SettingsContext updates state → useEffect detects the change → Document root element gets "light" or "dark" class added → All components re-render with new styling → Setting is saved to localStorage for persistence.
+
+Every component that needs theme-aware styling imports the useSettings hook and reads the current theme value. Based on this value, components conditionally apply different Tailwind CSS classes. For example, in light mode, backgrounds use white with slate borders, while dark mode uses transparent white overlays with white borders.
+
+The system also includes font size scaling and contrast adjustments. These are applied as CSS custom properties on the document root, which all components inherit automatically.
+
+### Integration Points
+
+SettingsContext wraps the entire app at the root level in App.tsx, making settings available to all child components. The Navbar component displays the theme toggle button, the SettingsModal provides the full settings interface, and every page component (Interviews, Questions, Applicants) uses conditional styling based on the theme value.
+
+The persistence layer automatically saves any settings change to localStorage and loads saved settings on app startup, ensuring user preferences survive page refreshes.
+
+---
+
+## 2. 🔌 API Architecture & Request Flow
+
+### How It Works
+
+The API layer is built on Axios and provides a centralized HTTP client with automatic authentication, error handling, and retry logic. The system uses three layers: Components → Custom Hooks → API Client → Backend.
+
+When a component needs data, it calls a custom hook like useInterviews. This hook internally calls the API client's get method. Before the request leaves the browser, the request interceptor automatically injects the JWT token for authentication and adds the username field to the request body (required for Row Level Security on the backend).
+
+The request travels to the PostgREST backend at comp2140a2.uqcloud.net/api. PostgREST validates the JWT token, checks that the username matches the authenticated user's permissions, processes the request, and returns the data.
+
+On the way back, the response interceptor logs the response in development mode and transforms any errors into a consistent ApiError format with user-friendly messages.
+
+### Error Handling & Retry Logic
+
+If a request fails due to network issues or server errors (5xx status codes), the retry logic automatically attempts the request up to 3 times with exponential backoff (1 second, then 2 seconds). This makes the app resilient to temporary network issues.
+
+### Integration Points
+
+The api/index.ts file creates and exports a single Axios instance used throughout the app. Custom hooks in useApiData.ts wrap API calls and provide React state management. Components never call the API directly—they always go through hooks.
+
+For example, when the Interviews page loads: InterviewsPage component → calls useApiData hook → hook calls apiService.get('/interview') → request interceptor adds auth → backend responds → response interceptor processes → hook updates state → component re-renders with data.
+
+The username injection is critical because the backend database has Row Level Security policies that check: "Does the username in this request match the authenticated user?" Without this automatic injection, every create and update would fail with a 403 Forbidden error.
+
+---
+
+## 3. 📱 Responsive Design with useIsMobile
+
+### How It Works
+
+The useIsMobile hook provides JavaScript-based responsive design by monitoring the browser viewport width. Instead of relying solely on CSS media queries, this hook creates a MediaQueryList object that watches for the viewport crossing the 768px breakpoint.
+
+When the viewport width changes and crosses the threshold, the MediaQueryList fires a change event. The hook captures this event, updates its React state, and triggers a re-render of any component using the hook.
+
+The key advantage over CSS media queries is that this allows components to conditionally render completely different component trees based on screen size, not just hide/show elements. This means mobile users don't download and render desktop components they'll never see.
+
+### Integration Points
+
+Components import useIsMobile and use the boolean return value to make rendering decisions. For example, the Navbar might render a hamburger menu on mobile but a full navigation bar on desktop. The sidebar could be a drawer on mobile and a fixed panel on desktop.
+
+The hook uses the standard Web API's matchMedia, which is supported in all modern browsers and performs better than resize event listeners because it only fires when crossing the specific breakpoint, not on every pixel change.
+
+---
+
+## 4. ⚙️ Environment Configuration System
+
+### How It Works
+
+The environment configuration centralizes all application settings in a single TypeScript file that reads from environment variables. Vite (the build tool) exposes environment variables prefixed with VITE_ to the client-side code through import.meta.env.
+
+The appConfig object provides type-safe access to settings like the API URL, feature flags, and timeout values. When the app builds for production, Vite replaces these environment variable references with their actual values, so the final bundle contains the correct configuration.
+
+Feature flags use boolean logic to enable or disable features. For example, AI features are automatically enabled if the VITE_LLM_API_KEY exists, without requiring a separate flag. This prevents features from being visible when they can't function.
+
+### Integration Points
+
+The API client imports appConfig to get the base URL and timeout values. Page components check feature flags before rendering optional features like AI question generation. The logging system adjusts its verbosity based on whether the environment is development or production.
+
+During local development, settings come from the .env file. In production, hosting platforms (like Netlify or Vercel) inject environment variables at build time. This allows the same codebase to work in multiple environments with different configurations.
+
+---
+
+## 5. 🔧 Context Providers: Settings & Tutorials
+
+### SettingsContext - Global State Management
+
+SettingsContext manages application-wide preferences using React's Context API. It maintains state for theme, font size, and contrast level, and exposes functions to update these settings.
+
+The provider wraps the entire application, making settings available to any component through the useSettings hook. When settings change, three things happen simultaneously: the state updates, the DOM is modified to apply visual changes, and localStorage is updated for persistence.
+
+The DOM manipulation applies CSS classes and custom properties to the document root element. Components don't need to know about these low-level details—they just read the settings value and apply appropriate styling.
+
+### TutorialContext - Interactive Onboarding
+
+TutorialContext provides step-by-step guided tours for different features. It maintains five pre-configured tutorial flows, each with multiple steps that highlight specific UI elements and explain their purpose.
+
+When a tutorial starts, the context sets the current flow and step index, then displays the TutorialOverlay component. This overlay creates a visual spotlight on the target element by positioning a highlight ring around it and showing a tooltip with instructions.
+
+As users progress through steps, the context tracks which tutorials have been completed and saves this to localStorage. This prevents tutorials from reappearing after completion.
+
+### Integration Points
+
+Both contexts wrap the app at the root level. The SettingsButton triggers the settings modal, while TutorialButton components scattered throughout the app launch specific tutorials. The TutorialOverlay component listens to the tutorial context and renders the visual guidance.
+
+Every page that needs theme-aware styling imports useSettings. Pages with complex workflows (like Interviews, Questions, Applicants) include TutorialButton components that launch their respective guided tours.
+
+---
+
+## 6. 🪝 Custom Hooks: Data Fetching Architecture
+
+### The Hook Hierarchy
+
+The hook system has two layers: generic hooks (useApiData, useMutation) and specialized hooks (useInterviews, useQuestions, etc.). This pattern reduces code duplication while providing convenient, resource-specific functions.
+
+### useApiData - GET Requests
+
+This generic hook handles any data-fetching scenario. It manages three pieces of state: data, loading, and error. When the component mounts, the hook automatically calls the fetcher function, sets loading to true, and waits for the response.
+
+On success, it stores the data and clears the error. On failure, it stores the error and clears the data. Either way, loading becomes false when done.
+
+The hook also watches a dependencies array. When any dependency changes, it automatically refetches the data. This is perfect for situations like "fetch questions when interviewId changes."
+
+### useMutation - POST/PATCH/DELETE
+
+Mutations work differently than queries because they don't auto-execute on mount. Instead, they return a mutate function that components call when needed (like when submitting a form).
+
+The mutation manages loading and error states, and crucially, it calls onSuccess and onError callbacks. This is how components refresh data after mutations—the onSuccess callback typically calls refetch() to update the list.
+
+### Specialized Hooks
+
+Hooks like useInterviews are thin wrappers around useApiData that provide resource-specific functionality. They know the correct API endpoint, data type, and dependencies, so components don't have to specify these details.
+
+### Integration Flow
+
+A typical data flow looks like this: Component calls useInterviews → hook calls useApiData → useApiData calls apiService.get → API client sends request → backend responds → hook updates state → component re-renders → UI updates.
+
+For mutations: Component calls deleteInterview → useMutation executes → API client sends DELETE → backend confirms → onSuccess fires → refetch() called → fresh data loads → UI updates to reflect deletion.
+
+The beauty of this system is that components remain simple. They don't manage loading states, handle errors, or orchestrate refetching. The hooks handle all complexity.
+
+---
+
+## 7. 🌐 Service Layer: API & AI Services
+
+### apiService - Backend Communication
+
+The API service is a singleton class that wraps Axios with enterprise-grade features. It handles authentication by injecting JWT tokens, manages retries for failed requests, and transforms errors into user-friendly messages.
+
+The request interceptor is the key to automation. Before every request, it adds the Authorization header with the JWT token. For mutations (POST/PATCH), it automatically injects the username field into the request body. This happens transparently—components never need to think about authentication or username requirements.
+
+The retry logic makes the app resilient. If a request fails due to network issues or server errors, the service waits one second and tries again. If that fails, it waits two seconds and tries a third time. Only after three failures does it give up and return an error.
+
+Error messages are humanized. Instead of showing "Error 404," users see "Resource not found." Instead of "ECONNABORTED," they see "Request timeout. Please check your connection."
+
+### openaiService - AI Integration
+
+The OpenAI service provides three AI-powered features: question generation, applicant feedback analysis, and performance analytics. All three use the GPT API with carefully crafted prompts.
+
+The service includes model fallback logic. It tries to use GPT-4o first (the best model), but if that's unavailable, it falls back to GPT-4o-mini, then GPT-4-turbo, then GPT-3.5-turbo. This ensures AI features work even with basic API access.
+
+Each AI function sends a detailed prompt to GPT, requesting a JSON response. The service then cleans the response (removing markdown code blocks if present) and parses it into a typed TypeScript object.
+
+Temperature settings control creativity. Question generation uses 0.7 (fairly creative, for variety), applicant feedback uses 0.6 (balanced), and performance analytics uses 0.5 (more analytical and consistent).
+
+### Integration Flow
+
+When a user clicks "Generate AI Questions": Questions page → calls aiService.generateInterviewQuestions → service builds prompt → sends to GPT → receives JSON response → cleans and parses JSON → returns array of questions → page saves each to database → refetches questions → UI shows new AI-generated questions with special "AI Generated" tags.
+
+The API service and AI service never interact directly—they're used by different parts of the app. API service handles all backend database operations, while AI service handles all GPT-based features.
+
+---
+
+## 8. 📋 Type System: Data Models & Safety
+
+### Purpose & Structure
+
+The types/models.ts file defines the shape of every data structure in the application. These TypeScript interfaces serve as contracts between the frontend and backend, ensuring both sides agree on data formats.
+
+The BaseModel interface defines common fields (id, username, timestamps) that all other models inherit. This promotes consistency and reduces duplication.
+
+### Model Patterns
+
+Each resource has two interfaces: the full model (with all fields including auto-generated ones) and an input model (for creating/updating, without auto-generated fields).
+
+For example, Interview includes the id field (assigned by the database), while InterviewInput omits it. When creating an interview, you use InterviewInput. When reading an interview, you get Interview.
+
+### Type Safety Benefits
+
+TypeScript validates types at compile time, catching errors before the code runs. If you try to assign an invalid status like "Active" to an interview, TypeScript immediately shows an error indicating the type mismatch.
+
+IDE autocomplete becomes incredibly powerful. When you type "interview." the IDE shows all available properties with their types. You can't accidentally reference a field that doesn't exist.
+
+When you refactor models, TypeScript identifies every place in the codebase that needs updating. If you add a new interview status, TypeScript flags all switch statements and conditionals that need to handle the new case.
+
+### Integration Points
+
+Custom hooks use generic types to ensure type safety. When you call useApiData with Interview array type, TypeScript knows the data will be Interview array or null. The mutate function knows it accepts InterviewInput and returns Interview.
+
+Components benefit from autocomplete and validation. When rendering an interview card, TypeScript ensures you don't access non-existent properties. When submitting forms, TypeScript validates that the data matches InterviewInput.
+
+The type system prevents entire categories of bugs. You can't accidentally send the wrong data to the API, can't forget required fields, and can't use the wrong status values. All these errors are caught during development, not in production.
+
+---
+
+## 🔄 Complete Application Flow: Real-World Example
+
+Let's trace a complete user journey to see how everything integrates:
+
+### Scenario: User Creates an Interview with AI Questions
+
+**Step 1: Page Load**
+- User navigates to /interviews
+- React Router matches route and renders InterviewsPage
+- Component calls useInterviews hook
+- Hook calls apiService.get('/interview')
+- Request interceptor adds JWT token
+- Backend returns interviews array
+- Component renders interview cards using theme from SettingsContext
+
+**Step 2: Create Interview**
+- User clicks "Create Interview" button
+- Navigate to /interviews/new
+- InterviewForm component renders
+- Form inputs are controlled by React state
+- User fills in title, job_role, description
+- User clicks "Save"
+
+**Step 3: Save Interview**
+- Form calls handleSubmit
+- Calls createInterview mutation from useCreateInterview hook
+- Hook calls apiService.post('/interview', formData)
+- Request interceptor injects username automatically
+- Backend validates, creates record, returns created interview with id
+- onSuccess callback fires and navigates to questions page
+
+**Step 4: Generate AI Questions**
+- Questions page loads, calls useQuestions with interviewId
+- Empty state shows (no questions yet)
+- User clicks "Generate AI Questions" button
+- AIQuestionGenerator modal opens
+- User selects difficulty: "Intermediate", count: 5
+- User clicks "Generate"
+
+**Step 5: AI Processing**
+- Component calls aiService.generateInterviewQuestions
+- Service builds prompt including job_role from interview
+- Tries GPT-4o model first
+- GPT returns JSON array of 5 questions with rationales
+- Service cleans and parses JSON
+- Returns GeneratedQuestion array to component
+
+**Step 6: Save Generated Questions**
+- Component loops through questions
+- For each question: calls api.post('/question', questionData)
+- Request interceptor adds username to each request
+- Backend creates all 5 questions
+- Component stores question IDs in localStorage to mark as AI-generated
+- Calls refetch to reload questions list
+
+**Step 7: Display Questions**
+- useQuestions refetches from backend
+- Hook retrieves AI question IDs from localStorage
+- Maps questions and adds source property (ai or manual)
+- Component renders question cards
+- AI-generated questions show purple "AI Generated" badge
+- Manual questions show blue "Manual" badge
+
+**Step 8: Theme Switching**
+- User clicks theme toggle in settings
+- SettingsContext updateSetting method called with 'theme' and 'light'
+- Context updates state
+- useEffect fires, removes 'dark' class from html element, adds 'light' class
+- localStorage saves preference
+- All components re-render with light mode styling
+- Questions page background changes from dark glass to white
+- Text colors change from white to slate
+- Borders change from translucent white to slate colors
+
+Throughout this entire flow, every architectural piece plays its role: SettingsContext provides theme to all components, API interceptors handle auth automatically, hooks manage loading and error states, TypeScript validates all data types, error boundaries catch any component errors, and the tutorial system can guide users through each step.
+
+---
+
+## 🔗 Cross-Component Integration Patterns
+
+### Pattern 1: Context + Hooks Pattern
+
+The app combines Context for global state with hooks for data fetching. SettingsContext provides theme/settings globally, while custom hooks fetch and mutate data. This separation of concerns keeps contexts focused on UI state and hooks focused on server state.
+
+### Pattern 2: Interceptor Automation
+
+The API interceptor pattern eliminates repetitive code. Instead of every component adding auth headers and username fields, the interceptor handles this once in a central location. This follows the DRY (Don't Repeat Yourself) principle.
+
+### Pattern 3: Hook Composition
+
+Specialized hooks compose generic hooks. useInterviews wraps useApiData, which uses apiService. Each layer adds value: useInterviews knows the endpoint, useApiData manages React state, apiService handles HTTP. This creates a clean separation of responsibilities.
+
+### Pattern 4: Type-Driven Development
+
+TypeScript types flow from models.ts through hooks into components. When you change an interface in models.ts, TypeScript immediately highlights every affected component. This makes refactoring safe and fast.
+
+### Pattern 5: Feature Flags
+
+The environment config enables progressive feature rollout. AI features are hidden when no API key exists. Tutorials can be disabled in production. This allows the same codebase to work in multiple configurations.
+
+### Pattern 6: Optimistic UI Updates
+
+Mutations use callbacks (onSuccess) to trigger refetching. When you delete an interview, the mutation's onSuccess calls refetch, which updates the list. The UI stays synchronized with the server without manual coordination.
+
+---
+
+## 🎯 Key Architectural Decisions
+
+### Why Context for Settings?
+
+Settings need to be accessible everywhere (Navbar, every page, modals). Prop drilling would be impractical. Context provides global access without passing props through every component.
+
+### Why Hooks for Data?
+
+Hooks encapsulate complex logic (loading states, error handling, refetching) into reusable functions. Without hooks, every component would duplicate this logic. Hooks also compose well—you can use multiple hooks in one component.
+
+### Why Axios over Fetch?
+
+Axios provides interceptors, automatic JSON parsing, request/response transformation, and better error handling. The interceptor pattern is crucial for automatic authentication.
+
+### Why TypeScript?
+
+TypeScript catches bugs at compile time instead of runtime. It provides autocomplete, refactoring safety, and self-documentation. The initial overhead pays dividends in reduced bugs and faster development.
+
+### Why Client-Side AI?
+
+Running AI directly in the browser (using OpenAI API) simplifies the architecture. No backend AI service needed. The tradeoff is exposing the API key, mitigated by API key restrictions and usage quotas.
+
+### Why localStorage for Settings?
+
+Settings need to persist across sessions but don't need server synchronization. localStorage is perfect for this—instant writes, no network latency, works offline.
+
+---
+
+This architecture creates a maintainable, scalable, and developer-friendly application where each component has a clear purpose and integrates seamlessly with others.
